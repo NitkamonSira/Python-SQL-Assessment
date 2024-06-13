@@ -6,153 +6,172 @@ month_list = ["January","Febuary","March","April","May","June","July","August","
 
 DATABASE = 'arp_vtuber.db'
 
-def member_info_list():
+def get_data_from_database(sql, params=None): 
     with sqlite3.connect(DATABASE) as db:
         cursor = db.cursor()
-        sql = "SELECT * FROM basic ;"
-        cursor.execute(sql)
+        if params is None:
+            cursor.execute(sql)
+        else:
+            cursor.execute(sql, params)
         results = cursor.fetchall()
-        
-        # for vtuber in results:
-        #     member_name.append(vtuber[1])
-        # # print nicely
-        # member_name.sort()
-        print(results)
-        
+    return results
+
+def create_language_dict():
+    language = {}
+    sql = "SELECT * FROM language;"
+    results = get_data_from_database(sql)
+    for data in results:
+        language[data[0]] = data[1]
+    return language
 
 def print_all_member_name():
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT * FROM basic ORDER BY lower(name);"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        print("\nName")
-        order = 1
-        for name in results:
-            print(f"{order}. {name[1]}")
-            order += 1
+    sql = "SELECT name FROM basic ORDER BY lower(name);"
+    results = get_data_from_database(sql)
+    print("\nName")
+    for name in results:
+        print(name[0])
 
 def print_all_member_order_by_subsciber():
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, youtube_subsciber FROM basic ORDER BY youtube_subsciber DESC;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        order = 0
-        # print nicely
-        print("\nName              Youtube Subsciber")
-        for name in results:
-            order += 1
-            if order >= 10:               
-                print(f"{order}. {name[0]:<15}{name[1]}")
-            else:
-                print(f"{order}. {name[0]:<16}{name[1]}")
-            
+
+    sql = "SELECT name, youtube_subsciber FROM basic ORDER BY youtube_subsciber DESC;"
+    
+    results = get_data_from_database(sql)
+    # print nicely
+    print(f"\n{'No':3}{'Name':15}Youtube Subsciber")
+    for i in range(len(results)):
+        print(f"{i + 1:<3}{results[i][0]:<15}{results[i][1]}")
+                    
 def print_all_member_order_by_birthday():
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, birthday FROM basic ORDER BY birthday;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        # print nicely
-        print("\nName           Birthday")
-        for vtuber in results:
-            
-            birthday = vtuber[1].split()
-            month = int(birthday[0])
-            print(f"{vtuber[0]:<15}{birthday[1]} {month_list[month-1]}")
+    sql = "SELECT name, birthday FROM basic ORDER BY birthday;"
+    results = get_data_from_database(sql)
+    print(f"\n{'Name':<15}Birthday")
+    for vtuber in results:
+        birthday = vtuber[1].split()
+        month = int(birthday[0])
+        print(f"{vtuber[0]:<15}{birthday[1]} {month_list[month-1]}")
             
 def print_all_member_unit():
-     with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, operation, unit FROM basic ORDER BY operation;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        print("\nName            Operation & Unit")
-        for vtuber in results:
-            print(f"{vtuber[0]:<15} {vtuber[1]} - {vtuber[2]}")
+    sql = "SELECT name, operation, unit FROM basic ORDER BY operation;"
+    results = get_data_from_database(sql)
+    print(f"\n{'Name':<15}Operation & Unit")
+    for vtuber in results:
+        print(f"{vtuber[0]:<15} {vtuber[1]} - {vtuber[2]}")
 
 def print_all_member_character():
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, character_type FROM basic ORDER BY lower(name);"
-        cursor.execute(sql)
-        results = cursor.fetchall()
+    sql = "SELECT name, character_type FROM basic ORDER BY lower(name);"
+    results = get_data_from_database(sql)
         
-        print("\nName           Character")
-        for vtuber in results:
-            print(f"{vtuber[0]:<15}{vtuber[1]}")
+    print(f"\n{'Name':<15}Character")
+    for vtuber in results:
+        print(f"{vtuber[0]:<15}{vtuber[1]}")
             
 def print_all_member_model_maker():
-      with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, model_artist, model_rigger FROM basic"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        print("\nName           Model Artist    Model Rigger")
-        for vtuber in results:
-            print(f"{vtuber[0]:<15}{vtuber[1]:<16}{vtuber[2]}")
+    sql = "SELECT name, model_artist, model_rigger FROM basic"
+    results = get_data_from_database(sql)
+    print(f"\n{'Name':<15}{'Model Artist':<16}Model Rigger")
+    for vtuber in results:
+        print(f"{vtuber[0]:<15}{vtuber[1]:<16}{vtuber[2]}")
             
-def print_all_member_debut():
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = "SELECT name, debut FROM basic ORDER BY debut;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        # print nicely
-        print("\nName           Debut")
+def print_all_member_debut():   
+        sql = "SELECT name, debut FROM basic ORDER BY debut;"        
+        results = get_data_from_database(sql)
+        print(f"\n{'Name':<15}Debut")
         for vtuber in results:
-            
             debut = vtuber[1].split()
             month = int(debut[1])
             print(f"{vtuber[0]:<15}{debut[2]} {month_list[month-1]} {debut[0]}")
             
 def print_all_member_height():
-      with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
         sql = "SELECT name, height FROM basic ORDER BY height;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        
-        print("\nName           Height")
+        results = get_data_from_database(sql)
+        print(f"\n{'Name':<15}Height")
         for vtuber in results:
             print(f"{vtuber[0]:<15}{vtuber[1]} cm.")
-   
-def search_about_in_name():
-    letter_name = input("What word or letter? : ")
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
-        sql = f"SELECT name FROM basic WHERE name LIKE '%{letter_name}%' ORDER BY name;"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        if len(results) == 0:
-            print(f'No one has "{letter_name}" in their name.')
+
+def print_all_member_language():
+    language = create_language_dict()
+    sql = "SELECT name, language1, language2, language3 FROM basic ORDER BY name;"
+    results = get_data_from_database(sql)
+    print(f"\n{'Name':<15}Language")
+    for vtuber in results:
+        if vtuber[3] is not None:
+            print(f"{vtuber[0]:<15}{language[vtuber[1]]}, {language[vtuber[2]]} and {language[vtuber[3]]}")
+        elif vtuber[2] is not None:
+            print(f"{vtuber[0]:<15}{language[vtuber[1]]} and {language[vtuber[2]]}")
         else:
-            print(f'Name of Vtuber who has "{letter_name}" in name!')
-            for vtuber in results:
-                print(f"{vtuber[0]}")
+            print(f"{vtuber[0]:<15}{language[vtuber[1]]}")
+
+def search_about_in_name():
+    beginOrIn = input("""A letter or word …
+1. At the beginning of the name 
+2. In anywhere of the name
+Enter a number: """)
+    while beginOrIn not in ["1", "2"]:
+        beginOrIn = input("""Please enter a number 1 or 2:
+Enter a number: """)
+    letter_name = input("What word or letter? : ")    
+    if beginOrIn == "1":
+        sql = f"SELECT name FROM basic WHERE name LIKE '{letter_name}%' ORDER BY name;"
+    elif beginOrIn == "2":
+        sql = f"SELECT name FROM basic WHERE name LIKE '%{letter_name}%' ORDER BY name;"
+    
+    results = get_data_from_database(sql)
+    if len(results) == 0:
+        print(f'No one has "{letter_name}" in their name.')
+    else:
+        print(f'Name of Vtuber who has "{letter_name}" in name!')
+        for vtuber in results:
+            print(f"{vtuber[0]}")
 
 def search_about_subscriber():
-    subscriber = input("How Many? :")
-    with sqlite3.connect(DATABASE) as db:
-        cursor = db.cursor()
+    higherOrLower = input("""Subscriber ...
+1. lower than
+2. higher than
+Enter a number: """)
+    while higherOrLower not in ["1", "2"]:
+        higherOrLower = input("""Please enter a number 1 or 2 
+Enter a number: """)
+    subscriber = input("How Many?:")
+    while not subscriber.isdigit():
+        subscriber = input("""Please enter a number!
+Enter a number: """)
+    if higherOrLower == "1":
+        sql = "SELECT name, youtube_subsciber FROM basic WHERE youtube_subsciber < ? ORDER BY youtube_subsciber DESC;"
+    elif higherOrLower == "2":
         sql = "SELECT name, youtube_subsciber FROM basic WHERE youtube_subsciber > ? ORDER BY youtube_subsciber DESC;"
-        cursor.execute(sql,(subscriber,))
-        results = cursor.fetchall()
-        order = 0
-        # print nicely
-        print("\nName              Youtube Subsciber")
-        for name in results:
-            order += 1
-            if order >= 10:               
-                print(f"{order}. {name[0]:<15}{name[1]}")
-            else:
-                print(f"{order}. {name[0]:<16}{name[1]}")
+        
+    results = get_data_from_database(sql,(subscriber,))
+
+    # print nicely
+    print(f"\n{'No':<3}{'Name':<15}Youtube Subsciber")
+    for i in range(len(results)):
+        print(f"{i + 1:<3}{results[i][0]:<15}{results[i][1]}")
+        
+def search_about_birthday():
+    birthday_month = input("""Birthday in which month?
+1. January
+2. Febuary
+3. March
+4. April
+5. May
+6. June
+7. July
+8. August
+9. September
+10. October
+11. November
+12. December
+Enter a number: """).zfill(2)
+    while birthday_month not in ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]:
+        birthday_month = input("""Please enter a number from 1 to 12
+Enter a number: """).zfill(2)
+    sql = f"SELECT name, birthday FROM basic WHERE birthday LIKE '{birthday_month}%'"
+    results = get_data_from_database(sql)
+    print(f"\n{'Name':<15}Birthday")
+    for vtuber in results:
+        birthday = vtuber[1].split()
+        month = int(birthday[0])
+        print(f"{vtuber[0]:<15}{birthday[1]} {month_list[month-1]}")
             
             
 def menu():
@@ -228,15 +247,7 @@ Please enter only a number!
 Enter a number: """)
 
 if __name__ == "__main__":
-    search_about_in_name()
-    
-    
-#   with sqlite3.connect(DATABASE) as db:
-#         cursor = db.cursor()
-#         sql = "SELECT ??? FROM ??? ..."
-#         cursor.execute(sql)
-#         results = cursor.fetchall()
-#         
-#         print("???")
-#         for ??? in results:
-#             print(f"{???}")
+    print_all_member_language()
+    # menu()
+    # search_about_birthday()
+    # create_language_dict()
